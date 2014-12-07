@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\TestCases">
+      <UniqueIdentifier>{0601600c-b038-45f2-a0f0-ef65d9edc604}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TestCases\TestCaseBratus">
+      <UniqueIdentifier>{4a035f01-9ad2-4b9b-970d-f26f695ce692}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ReplicatorModel">
+      <UniqueIdentifier>{da1f0d5d-c890-4d98-bc2e-3e0633600f92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\IterativeSolvers">
+      <UniqueIdentifier>{ac6b9ed3-5418-4847-b6a6-7166c7857f04}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -22,6 +34,24 @@
   <ItemGroup>
     <ClInclude Include="expm.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestCases\Tests.h">
+      <Filter>Header Files\TestCases</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestCases\TestCaseBratus\TestCaseBratus.h">
+      <Filter>Header Files\TestCases\TestCaseBratus</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ReplicatorModel\ReplicatorModel.h">
+      <Filter>Header Files\ReplicatorModel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestCases\TestCase.h">
+      <Filter>Header Files\TestCases</Filter>
+    </ClInclude>
+    <ClInclude Include="src\IterativeSolvers\bicgstab.h">
+      <Filter>Header Files\IterativeSolvers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestCases\TestCase2MatrixDiffusion\TestCase2MatrixDiffusion.h">
+      <Filter>Header Files\TestCases\TestCaseBratus</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
