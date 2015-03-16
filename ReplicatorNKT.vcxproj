@@ -160,7 +160,8 @@
     <ClInclude Include="src\TestCases\TestCase.h" />
     <ClInclude Include="src\TestCases\TestCase2MatrixDiffusion\TestCase2MatrixDiffusion_1.h" />
     <ClInclude Include="src\TestCases\TestCase2MatrixDiffusion\TestCase2MatrixDiffusion_2.h" />
-    <ClInclude Include="src\TestCases\TestCaseBimatrix\TestCaseBimatrix.h" />
+    <ClInclude Include="src\TestCases\TestCaseBimatrix\TestCaseBimatrix1.h" />
+    <ClInclude Include="src\TestCases\TestCaseBimatrix\TestCaseBimatrix2.h" />
     <ClInclude Include="src\TestCases\TestCaseBratus\TestCaseBratus.h" />
     <ClInclude Include="src\TestCases\Tests.h" />
   </ItemGroup>

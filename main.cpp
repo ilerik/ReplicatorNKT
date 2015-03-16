@@ -11,7 +11,7 @@ int main(int argc, char *argv[]) {
 	test.RunTest();
 	return 0;*/
 
-	TestCaseBimatrix test;
+	TestCaseBimatrix1 test;
 	test.RunTest();
 	return 0;
 };

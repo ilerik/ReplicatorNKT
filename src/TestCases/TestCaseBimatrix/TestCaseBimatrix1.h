@@ -1,13 +1,13 @@
-#ifndef ReplicatorNKT_TestCases_TestCase2MatrixDiffusion_TestCaseBimatrix
-#define ReplicatorNKT_TestCases_TestCase2MatrixDiffusion_TestCaseBimatrix
+#ifndef ReplicatorNKT_TestCases_TestCase2MatrixDiffusion_TestCaseBimatrix1
+#define ReplicatorNKT_TestCases_TestCase2MatrixDiffusion_TestCaseBimatrix1
 
 #include "TestCase.h"
 #include "ReplicatorModel.h"
 
-class TestCaseBimatrix : public TestCase {
+class TestCaseBimatrix1 : public TestCase {
 public:
 	void RunTest() {		
-		const double maxTime = 100.0; //Maximal simulation time
+		const double maxTime = 20.0; //Maximal simulation time
 		const double snapshotTime = 0.1; //Save solution every snapshot time
 		const double xMin = 0.0; //Left border coordinate
 		const double xMax = 1.0; //Right border coordinate	
@@ -63,20 +63,17 @@ public:
 		kernel.WritePhasePortrait("game.dat", 100);
 
 		//Diffusion
-		const double D = 1;
+		const double D = 1; //On
 		kernel.SetDiffusionCoefficient(0, 0, 0.02 * D); //0.03
 		kernel.SetDiffusionCoefficient(0, 1, 0.02 * D); //0.02
 		kernel.SetDiffusionCoefficient(1, 0, 0.02 * D); //0.03
 		kernel.SetDiffusionCoefficient(1, 1, 0.02 * D); //0.02	
 
-		//Output phase portrait with diffusion
-		//kernel.WritePhasePortrait("gameDiffusion.dat", 10);
-
 		//Fill initial conditions					 
-		double u0avg = 0.55;
-		double u1avg = 0.45;
-		double v0avg = 0.6;
-		double v1avg = 0.4;
+		double u0avg = 0.50;
+		double u1avg = 0.50;
+		double v0avg = 0.65;
+		double v1avg = 0.35;
 
 		auto normalDistribution = [&](double x, double my, double sd) {
 			const double pi = 3.14159265359;
@@ -84,7 +81,7 @@ public:
 			return pd;
 		};
 
-		auto dist = std::bind(normalDistribution, std::placeholders::_1, 0.4, 0.1);
+		auto dist = std::bind(normalDistribution, std::placeholders::_1, 0.4, 0.5);
 		//auto dist = [](double x) { return 1.0; };
 
 		std::vector<double> avg;
@@ -94,27 +91,6 @@ public:
 		avg.push_back(v1avg);
 
 		kernel.SetInitialConditions(avg, dist);
-
-		/*std::vector<std::vector<double> > initValues;
-		for (int i = 0; i< nCells; i++) {
-			Vertex& vertex = kernel.getVertex(i);
-			std::vector<double> u;
-			const double du0 = 0.5;
-			double u0 = u0avg + 2 * du0 * (kernel.getVertex(i).x - 0.5);
-			double u1 = u1avg;
-			double v0 = v0avg;
-			double v1 = v1avg;
-			if (( i == nCells / 2) || (i == (nCells-1.0) / 2)) {
-				u0 = 0.5 * nCells * u0avg;
-			};
-			u.push_back(u0);
-			u.push_back(u1);
-			u.push_back(v0);
-			u.push_back(v1);			
-			initValues.push_back(u);	
-		};
-
-		kernel.SetInitialConditions(initValues);	*/
 
 		//Run simulation
 		kernel.RunCalculation(10000000, 0.0, snapshotTime, maxTime, CFL, maxTimeStep);

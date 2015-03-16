@@ -28,6 +28,9 @@
     <Filter Include="Header Files\TestCases\TestCaseBimatrix">
       <UniqueIdentifier>{dcc93d3e-52ca-4329-a74a-6dc00872328f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\TestCases\TestCase2MatrixDiffusion">
+      <UniqueIdentifier>{d9ee3818-14cf-4a11-ad9e-f566128d77da}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -53,13 +56,16 @@
     <ClInclude Include="src\IterativeSolvers\bicgstab.h">
       <Filter>Header Files\IterativeSolvers</Filter>
     </ClInclude>
-    <ClInclude Include="src\TestCases\TestCase2MatrixDiffusion\TestCase2MatrixDiffusion_2.h">
-      <Filter>Header Files\TestCases\TestCaseBratus</Filter>
-    </ClInclude>
     <ClInclude Include="src\TestCases\TestCase2MatrixDiffusion\TestCase2MatrixDiffusion_1.h">
-      <Filter>Header Files\TestCases\TestCaseBratus</Filter>
+      <Filter>Header Files\TestCases\TestCase2MatrixDiffusion</Filter>
     </ClInclude>
-    <ClInclude Include="src\TestCases\TestCaseBimatrix\TestCaseBimatrix.h">
+    <ClInclude Include="src\TestCases\TestCase2MatrixDiffusion\TestCase2MatrixDiffusion_2.h">
+      <Filter>Header Files\TestCases\TestCase2MatrixDiffusion</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestCases\TestCaseBimatrix\TestCaseBimatrix1.h">
+      <Filter>Header Files\TestCases\TestCaseBimatrix</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TestCases\TestCaseBimatrix\TestCaseBimatrix2.h">
       <Filter>Header Files\TestCases\TestCaseBimatrix</Filter>
     </ClInclude>
   </ItemGroup>
