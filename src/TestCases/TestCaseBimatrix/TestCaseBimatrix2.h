@@ -7,15 +7,15 @@
 class TestCaseBimatrix2 : public TestCase {
 public:
 	void RunTest() {		
-		const double maxTime = 100.0; //Maximal simulation time
-		const double snapshotTime = 0.1; //Save solution every snapshot time
+		const double maxTime = 20.0; //Maximal simulation time
+		const double snapshotTime = 0.6; //Save solution every snapshot time
 		const double xMin = 0.0; //Left border coordinate
 		const double xMax = 1.0; //Right border coordinate	
 		const double CFL = 0.1; //CFL number
 		const double maxTimeStep = 0.01; //
 		const int n = 2; //Number of strategies for first species
 		const int m = 2; //Number of strategies for second species
-		const int nCells = 100; //Number of cells
+		const int nCells = 50; //Number of cells
 
 		//Specify game matrices
 		double a = 3;
