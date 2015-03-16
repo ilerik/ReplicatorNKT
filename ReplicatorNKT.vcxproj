@@ -101,7 +101,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>src\ReplicatorModel;src\TestCases;src\TestCases\TestCaseBratus;src\IterativeSolvers;src\TestCase2MatrixDiffusion;C:\Program Files %28x86%29\Intel\ComposerXE-2011\mkl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src\ReplicatorModel;src\TestCases;src\TestCases\TestCaseBratus;src\TestCases\TestCase2MatrixDiffusion;src\IterativeSolvers;C:\Program Files %28x86%29\Intel\ComposerXE-2011\mkl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,7 +139,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>src\ReplicatorModel;src\TestCases;src\TestCases\TestCaseBratus;src\IterativeSolvers;src\TestCase2MatrixDiffusion;C:\Program Files %28x86%29\Intel\ComposerXE-2011\mkl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src\ReplicatorModel;src\TestCases;src\TestCases\TestCaseBratus;src\TestCases\TestCase2MatrixDiffusion;src\IterativeSolvers;C:\Program Files %28x86%29\Intel\ComposerXE-2011\mkl\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -158,7 +158,9 @@
     <ClInclude Include="src\IterativeSolvers\bicgstab.h" />
     <ClInclude Include="src\ReplicatorModel\ReplicatorModel.h" />
     <ClInclude Include="src\TestCases\TestCase.h" />
-    <ClInclude Include="src\TestCases\TestCase2MatrixDiffusion\TestCase2MatrixDiffusion.h" />
+    <ClInclude Include="src\TestCases\TestCase2MatrixDiffusion\TestCase2MatrixDiffusion_1.h" />
+    <ClInclude Include="src\TestCases\TestCase2MatrixDiffusion\TestCase2MatrixDiffusion_2.h" />
+    <ClInclude Include="src\TestCases\TestCaseBimatrix\TestCaseBimatrix.h" />
     <ClInclude Include="src\TestCases\TestCaseBratus\TestCaseBratus.h" />
     <ClInclude Include="src\TestCases\Tests.h" />
   </ItemGroup>

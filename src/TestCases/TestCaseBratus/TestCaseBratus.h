@@ -32,6 +32,17 @@ public:
 		A[1][0] = 1.2;
 		A[1][1] = 0.9;
 
+		std::ofstream ofsGame("game.dat");
+		int nu = 100;
+		ofsGame<<"VARIABLES = "<<"\""<<"u"<<"\" "<<"\""<<"v"<<"\" "<<"\""<<"f"<<"\"\n";
+		for (double u = 0; u <= 1.0; u += 1.0 / nu) {
+			double v = 1.0 - u;
+			double f = u * (A[0][0] * u + A[0][1] * v) + v * (A[1][0] * u + A[1][1] * v);
+			ofsGame<<u<<" "<<v<<" "<<f<<"\n";
+		};
+
+		ofsGame.close();
+
 
 		//For replicator model class
 		std::vector<int> nStrategies; 

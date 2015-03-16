@@ -6,9 +6,10 @@
 #include <vector>
 #include <limits>
 #include <map>
-#include <math.h>
+#include <cmath>
 #include <sstream>
 #include <cassert>
+#include <functional>
 #include "bicgstab.h"
 
 double computeFitness() {
@@ -250,7 +251,7 @@ public:
 						};
 					};
 				};
-			};						
+			};
 
 			//"diffusion term"
 			//between each pair of cells
@@ -332,9 +333,21 @@ public:
 		};	
 
 		//Normilize distribution
-		for (int i = 0; i<_nCells; i++) {			
-			for (int j = 0; j<_nVariables; j++) {			
-				_values[i * _nVariables + j] /= norm;
+		for (int iSp = 0; iSp < _nSpecies; iSp++) {
+			double sum = 0;
+			for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {
+				for (int i = 0; i< _nCells; i++) {
+					int startIndex = _getIndex(i, iSp, iSt);
+					sum += _values[startIndex];
+				};		
+			};
+
+			double A = 1.0 / sum;
+			for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {
+				for (int i = 0; i< _nCells; i++) {
+					int startIndex = _getIndex(i, iSp, iSt);
+					_values[startIndex] *= A;
+				};	
 			};
 		};
 	};
@@ -357,6 +370,52 @@ public:
 				_values[startIndex + j] = initValues[i][j];//inV[j];
 			};
 		};
+	};
+
+	void SetInitialConditions(std::vector<double> avg, std::function<double(double)> dist) {
+		//Write to each vertex
+		double sum = 0;
+ 		for (int i = 0; i< _nCells; i++) {
+			double x = _vertices[i].x;
+			double cDistribution = dist(_vertices[i].x);
+			int startIndex = _getIndex(i, 0, 0);
+			for (int j = 0; j<_nVariables; j++) {
+				_values[startIndex + j] = cDistribution;
+				sum += cDistribution;
+			};
+		};
+
+		for (int iSp = 0; iSp < _nSpecies; iSp++) {
+			double sum = 0;
+			double avgSum = 0;
+			for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {
+				int index = _getIndex(0, iSp, iSt);
+				avgSum += avg[index];
+				for (int i = 0; i< _nCells; i++) {
+					int startIndex = _getIndex(i, iSp, iSt);
+					sum += _values[startIndex];
+				};		
+			};
+
+			double A = avgSum / sum;
+			for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {
+				for (int i = 0; i< _nCells; i++) {
+					int index = _getIndex(0, iSp, iSt);
+					int startIndex = _getIndex(i, iSp, iSt);
+					_values[startIndex] *= avg[index] * A;
+				};	
+			};
+		};		
+
+		//Normilize
+		/*double norm = 1.0 * _nSpecies;
+		double A = norm / sum;
+		for (int i = 0; i< _nCells; i++) {
+			int startIndex = _getIndex(i, 0, 0);
+			for (int j = 0; j<_nVariables; j++) {
+				_values[startIndex + j] *= avg[j] * A;
+			};
+		};*/
 	};
 
 	//Set diffusion coefficients
@@ -383,7 +442,8 @@ public:
 		_time = startTime;	
 		_nextSnapshotTime = startTime;
 		std::ofstream ofs;
-		std::ofstream ofsTime("t.txt");
+		std::ofstream ofsTime("history.dat");
+		std::ofstream ofsConvergence("historyConvergence.dat");
 		std::ofstream ofsX("x.txt");
 		std::ofstream ofsValues("u.txt");
 		std::stringstream uname;
@@ -396,11 +456,52 @@ public:
 				for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {					
 					uname.str(std::string());
 					uname<<"u_"<<iSp<<"_"<<iSt;
-					ofs<<"\""<<uname.str()<<" ";			
+					ofs<<"\""<<uname.str()<<"\""<<" ";			
 				};
-
 			};						
 			ofs<<"\n";
+
+			//Convergence history file header
+			ofsConvergence<<"VARIABLES= \"t\" ";
+			ofsConvergence<<"\"total_residual\" ";
+			ofsConvergence<<"\"total_sd\" ";			
+			for (int iSp = 0; iSp < _nSpecies; iSp++) {
+				for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {					
+					uname.str(std::string());
+					uname<<"avg_u_"<<iSp<<"_"<<iSt;
+					ofsConvergence<<"\""<<uname.str()<<"\""<<" ";			
+				};
+			};				
+			for (int iSp = 0; iSp < _nSpecies; iSp++) {
+				for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {					
+					uname.str(std::string());
+					uname<<"sd_u_"<<iSp<<"_"<<iSt;
+					ofsConvergence<<"\""<<uname.str()<<"\""<<" ";			
+				};
+			};			
+			ofsConvergence<<std::endl;
+
+			ofsTime<<"VARIABLES= \"t\" ";
+			for (int iSp = 0; iSp < _nSpecies; iSp++) {
+				for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {					
+					uname.str(std::string());
+					uname<<"u_"<<iSp<<"_"<<iSt;
+					ofsTime<<"\""<<uname.str()<<"\""<<" ";			
+				};
+			};		
+
+			//Average fitness for each game
+			for (auto p1 : _games) {
+				int iSp1 = p1.first;
+				for (auto p2 : p1.second) {
+					int iSp2 = p2.first;
+					uname.str(std::string());
+					uname<<"f_"<<iSp1<<"_"<<iSp2;
+					ofsTime<<"\""<<uname.str()<<"\""<<" ";
+				};
+			};
+
+			ofsTime<<"\n";
 
 			//Coords to file
 			for (int i = 0; i<_nCells; i++) {
@@ -422,6 +523,59 @@ public:
 			};
 			L2norm = sqrt(L2norm);
 
+			//Compute average values and standart deviations
+			std::vector<double> sd(_nVariables);
+			std::vector<double> avg(_nVariables);
+			for (int iSp = 0; iSp < _nSpecies; iSp++) {
+				for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {
+					int index = _getIndex(0, iSp, iSt);
+					
+					avg[index] = 0;
+					double totalS = 0;
+					for (int cellInd = 0; cellInd < _nCells; cellInd++) {		
+						int startIndex = _getIndex(cellInd, iSp, iSt);
+						Vertex& v = getVertex(cellInd);
+						double S = v.h;
+						totalS += S;
+						avg[index] += S * _values[startIndex];
+					};
+					avg[index] /= totalS;
+					
+					sd[index] = 0;
+					totalS = 0;
+					for (int cellInd = 0; cellInd < _nCells; cellInd++) {		
+						int startIndex = _getIndex(cellInd, iSp, iSt);
+						Vertex& v = getVertex(cellInd);
+						double S = v.h;
+						totalS += S;
+						sd[index] += std::pow(S * (_values[startIndex] - avg[index]), 2); 	
+					};
+					sd[index] = std::sqrt(sd[index]) / totalS;
+				};
+			};
+
+
+			//Output convergence history
+			double total_sd = 0;
+			for (double& sdval : sd) total_sd += sdval;
+			ofsConvergence<<_time<<" ";
+			ofsConvergence<<L2norm<<" ";
+			ofsConvergence<<total_sd<<" ";	
+			
+			for (int iSp = 0; iSp < _nSpecies; iSp++) {
+				for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {
+					int index = _getIndex(0, iSp, iSt);
+					ofsConvergence<<avg[index]<<" ";			
+				};
+			};				
+			for (int iSp = 0; iSp < _nSpecies; iSp++) {
+				for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {
+					int index = _getIndex(0, iSp, iSt);
+					ofsConvergence<<sd[index]<<" ";			
+				};
+			};		
+			ofsConvergence<<std::endl;
+
 			//Output data snapshot
 			if ((output) && (_time == _nextSnapshotTime)) {				
 				//Save values to file
@@ -440,6 +594,30 @@ public:
 
 				//Save time to file
 				ofsTime<<_time<<" ";
+
+				//Save average values to file				
+				for (int j = 0; j<_nSpecies; j++) {
+					for (int k = 0; k<_nStrategies[j]; k++) {
+						double sum = 0;
+						for (int i = 0; i<_nCells; i++) {														
+							int index = _getIndex(i, j, k);
+							sum+=_values[index];
+						};
+						sum /= _nCells;
+						ofsTime<<sum<<" ";
+					};					
+				};
+
+				//Save average fitness for each game
+				for (auto p1 : _games) {
+					int iSp1 = p1.first;
+					for (auto p2 : p1.second) {
+						int iSp2 = p2.first;
+						ofsTime<<_avgFitness[iSp1][iSp2]<<" ";
+					};
+				};
+				
+				ofsTime<<"\n";
 				
 				//Save values to file				
 				for (int j = 0; j<_nSpecies; j++) {
@@ -456,7 +634,7 @@ public:
 			//Update next snapshot time
 			if (_time == _nextSnapshotTime) _nextSnapshotTime += snapshotTime;
 
-			double avgFitness = _avgFitness[0][0];
+			double avgFitness = _avgFitness[0][1];
 			if (verbose) std::cout<<"Iteration "<<_iter<<"; ";
 			if (verbose) std::cout<<"Time : " <<_time << "; "<<" dt = "<< _time - prevTime <<" L2-residual = "<<L2norm<<" Average fitness = "<<avgFitness<<"\n";
 			if (L2norm < 1e-20) {
@@ -475,11 +653,122 @@ public:
 			ofsX.close();
 			ofsTime.close();
 			ofsValues.close();
+			ofsConvergence.close();
 		};
 	};
 
 	//Export data to tecplot
 	void WriteToTecplot() {
+	};
+
+	void WritePhasePortrait(std::string fname, int nRes) {
+		std::ofstream ofs(fname);
+
+		//Output part header
+		std::stringstream uname;
+		ofs<<"VARIABLES= ";
+		for (int iSp = 0; iSp < _nSpecies; iSp++) {
+			for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {					
+				uname.str(std::string());
+				uname<<"u_"<<iSp<<"_"<<iSt;
+				ofs<<"\""<<uname.str()<<"\""<<" ";			
+			};
+		};		
+		for (int iSp = 0; iSp < _nSpecies; iSp++) {
+			for (int iSt = 0; iSt < _nStrategies[iSp]; iSt++) {					
+				uname.str(std::string());
+				uname<<"du_"<<iSp<<"_"<<iSt;
+				ofs<<"\""<<uname.str()<<"_dt\""<<" ";			
+			};
+		};		
+		ofs<<std::endl;
+
+		//Compute residual in every point averaged over 
+		std::vector<double> u(0);
+
+		std::function<void(int, int)> outputPoint = [&](int iSp, int iSt) {
+			//Iterative part
+			if (iSp < this->_nSpecies) {
+				double uvalue = 0;
+				//If it's the last strategy use normalization criterium to compute value
+				if (iSt == _nStrategies[iSp] - 1) {
+					uvalue = 1.0;
+					for (int i = 1; i < _nStrategies[iSp]; i++) uvalue -= *(std::end(u) - i);
+
+					//If normilized value is negative cut that execution branch
+					if (uvalue < 0) return;
+					
+					//If it's the last strategy move to the next specie
+					u.push_back(uvalue);
+					outputPoint(iSp+1, 0);
+					u.pop_back();
+					return;
+				};
+
+				for (int i = 0; i < nRes; i++) {
+					//Compute variable variants
+					uvalue = 1.0 * i / nRes;
+
+					//If possible move to the next strategy
+					if (iSt < _nStrategies[iSp] - 1) {
+						u.push_back(uvalue);
+						outputPoint(iSp, iSt+1);
+						u.pop_back();
+					};
+				};
+
+				return;
+			};
+
+			//Calculation part
+			std::vector<double> U(_nCells * _nVariables);
+			std::vector<double> R(_nCells * _nVariables);
+			//Write values
+			for (int cellInd = 0; cellInd < _nCells; cellInd++) {
+				//Get cell info
+				Vertex& cell = _vertices[cellInd];
+				int startInd = _getIndex(cellInd, 0, 0);
+				for (int i = 0; i < _nVariables; i++) U[startInd + i] = u[i];
+			};
+
+			ComputeResidual(R, U); //Compute residual
+
+			std::vector<double> Ravg(_nVariables);
+			for (int i = 0; i<_nVariables; i++) Ravg[i] = 0; //Initialize
+			for (int cellInd = 0; cellInd < _nCells; cellInd++) {
+				//Get cell info
+				Vertex& cell = _vertices[cellInd];
+				int startInd = _getIndex(cellInd, 0, 0);
+				for (int iSp = 0; iSp < _nSpecies; iSp++) {
+					for (int iSt = 0; iSt < _nStrategies[iSp] - 1; iSt++) {
+						int index = _getIndex(cellInd, iSp, iSt);
+						//
+						for (int i = 0; i<_nVariables; i++) Ravg[i] += R[startInd + i]; //Sum
+					};
+				};
+			};
+			for (int i = 0; i<_nVariables; i++) Ravg[i] /= 1.0 * _nCells; //Average
+
+			//Output state variables
+			for (int i = 0; i<_nVariables; i++) {
+				ofs<<u[i]<<" ";
+			};
+
+			//Output averaged over cells residual
+			for (int i = 0; i<_nVariables; i++) {
+				ofs<<-Ravg[i]<<" ";
+			};
+			ofs<<std::endl;
+
+			//Leave
+			return;
+		}; //outputPoint()
+	
+		//Make call
+		outputPoint(0,0);
+		
+		//CLose output stream
+		ofs.close();
 	};
 };
 
