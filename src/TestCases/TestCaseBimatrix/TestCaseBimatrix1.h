@@ -40,6 +40,7 @@ public:
 		A[0][1] = G;
 		A[1][0] = G - C/2 - E;
 		A[1][1] = G - C/2;
+
 		//Payoff matrix for female species
 		DenseMatrix B(n, m);
 		B[0][0] = 0.0;
@@ -48,7 +49,7 @@ public:
 		B[1][1] = G - C/2;
 
 		//For replicator model class
-		std::vector<int> nStrategies; 
+		std::vector<int> nStrategies;
 		nStrategies.push_back(n);
 		nStrategies.push_back(m);
 		ReplicatorModel kernel(2, nStrategies, nCells);
